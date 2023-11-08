@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Player with Playlist</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='player.css') }}">
+</head>
+<body>
+    <div class="audio-player">
+        <audio id="audio" controls>
+            <source src="" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <div class="playlist">
+            <h2>Playlist</h2>
+            <ul id="playlist"></ul>
+        </div>
+        <div class="controls">
+            <button id="previous">Previous</button>
+            <button id="shuffle">Shuffle</button>
+            <button id="next">Next</button>
+        </div>
+        <div class="track-info">
+            <p id="track-name">Current Track: N/A</p>
+        </div>
+    </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const audio = document.getElementById("audio");
+        const playlist = document.getElementById("playlist");
+        const shuffleButton = document.getElementById("shuffle");
+        const nextButton = document.getElementById("next");
+        const prevButton = document.getElementById("previous");
+        const trackNameDisplay = document.getElementById("track-name");
+
+        // Define your audio files
+        const audioFiles = [
+            "{{ url_for('serve_audio', filename='song1.mp3') }}",
+            "{{ url_for('serve_audio', filename='song2.mp3') }}",
+            "{{ url_for('serve_audio', filename='song3.mp3') }}",
+            "{{ url_for('serve_audio', filename='song4.mp3') }}",
+            "{{ url_for('serve_audio', filename='song5.mp3') }}",
+            "{{ url_for('serve_audio', filename='song6.mp3') }}",
+            "{{ url_for('serve_audio', filename='song7.mp3') }}",
+            "{{ url_for('serve_audio', filename='song8.mp3') }}",
+            "{{ url_for('serve_audio', filename='song9.mp3') }}",
+            "{{ url_for('serve_audio', filename='song10.mp3') }}",
+            "{{ url_for('serve_audio', filename='song11.mp3') }}",
+            "{{ url_for('serve_audio', filename='song12.mp3') }}",
+            // Add more audio files here
+        ];
+
+        // Initialize the current audio index
+        let currentAudioIndex = 0;
+
+        // Function to load and play audio
+        function playAudio(index) {
+            audio.src = audioFiles[index];
+            audio.load();
+            audio.play();
+            trackNameDisplay.textContent = `Current Track: ${audioFiles[index].substring(audioFiles[index].lastIndexOf('/') + 1)}`;
+        }
+
+        // Create playlist items and set up click handlers
+        audioFiles.forEach((file, index) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = file.substring(file.lastIndexOf('/') + 1);
+            listItem.addEventListener("click", () => {
+                currentAudioIndex = index;
+                playAudio(currentAudioIndex);
+            });
+            playlist.appendChild(listItem);
+        });
+
+        // Play the first song on page load
+        playAudio(currentAudioIndex);
+
+        // Shuffle button click handler
+        shuffleButton.addEventListener("click", () => {
+            const shuffledIndex = Math.floor(Math.random() * audioFiles.length);
+            currentAudioIndex = shuffledIndex;
+            playAudio(currentAudioIndex);
+        });
+
+        // Next button click handler
+        nextButton.addEventListener("click", () => {
+            currentAudioIndex = (currentAudioIndex + 1) % audioFiles.length;
+            playAudio(currentAudioIndex);
+        });
+
+        // Previous button click handler
+        prevButton.addEventListener("click", () => {
+            currentAudioIndex = (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length;
+            playAudio(currentAudioIndex);
+        });
+
+        // Update the playlist with the currently playing song
+        audio.addEventListener("play", () => {
+            const playlistItems = playlist.querySelectorAll("li");
+            playlistItems.forEach((item, index) => {
+                item.classList.remove("active");
+                if (index === currentAudioIndex) {
+                    item.classList.add("active");
+                }
+            });
+        });
+    });
+
+    </script>
+</body>
+</html>
+
